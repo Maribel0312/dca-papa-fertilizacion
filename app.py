@@ -7,764 +7,474 @@ import plotly.graph_objects as go
 from io import BytesIO
 
 # Configuración de la página
-st.set_page_config(page_title="Análisis DCA - Fertilización Papa", layout="wide", page_icon="🥔")
+st.set_page_config(page_title="🥔 DCA Papa - Fertilización", layout="wide", page_icon="🥔", initial_sidebar_state="expanded")
 
-# CSS personalizado para colores verdes pasteles
+# CSS personalizado - Diseño TIPO DASHBOARD
 st.markdown("""
 <style>
+    /* Fondo principal */
     .main {
-        background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+        background: #f5f5f5;
     }
+    
+    /* Cards con sombra */
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    /* Botones personalizados */
     .stButton>button {
-        background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+        width: 100%;
+        background: linear-gradient(45deg, #4caf50, #8bc34a);
         color: white;
-        border-radius: 20px;
         border: none;
-        padding: 10px 25px;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
     }
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
+    
+    /* Métricas */
     div[data-testid="stMetricValue"] {
+        font-size: 32px;
         color: #2e7d32;
-        font-size: 28px;
-        font-weight: bold;
     }
-    .css-1d391kg {
-        background-color: #c8e6c9;
+    
+    /* Tabs personalizados */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background-color: #e8f5e9;
+        border-radius: 8px 8px 0 0;
+        padding: 12px 24px;
+        font-weight: 600;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #66bb6a;
+        color: white;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ENCABEZADO PERSONALIZADO con gradiente verde pastel
+# HEADER TIPO BANNER
 st.markdown("""
-<div style='background: linear-gradient(135deg, #a5d6a7 0%, #c8e6c9 50%, #e8f5e9 100%); 
-            padding: 30px; 
-            border-radius: 20px; 
-            margin-bottom: 30px;
-            box-shadow: 0 8px 16px rgba(46, 125, 50, 0.2);
-            border: 3px solid #81c784;'>
-    <h1 style='text-align: center; 
-               color: #1b5e20; 
-               font-size: 42px;
-               text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
-               margin-bottom: 10px;'>
-        🥔 Análisis Estadístico de Diseños Experimentales 🌱
-    </h1>
-    <h2 style='text-align: center; 
-               color: #2e7d32; 
-               font-size: 28px;
-               margin-bottom: 15px;'>
-        Diseño Completamente al Azar (DCA) - Fertilización en Papa
-    </h2>
-    <div style='background-color: rgba(255,255,255,0.9); 
-                padding: 15px; 
-                border-radius: 15px;
-                border-left: 5px solid #43a047;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>
-        <p style='text-align: center; 
-                  font-size: 22px; 
-                  color: #1b5e20;
-                  margin: 0;
-                  font-weight: bold;'>
-            👨‍🎓 <span style='color: #2e7d32;'>Sergio Ronald Quispe Calsin</span> | 
-            📋 Código: <span style='color: #43a047;'>221235</span>
-        </p>
+<div style='background: linear-gradient(90deg, #2e7d32 0%, #4caf50 50%, #66bb6a 100%);
+            padding: 10px 30px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);'>
+    <div style='display: flex; justify-content: space-between; align-items: center;'>
+        <div>
+            <h1 style='margin: 0; font-size: 28px;'>🥔 Sistema de Análisis Estadístico - Fertilización Papa</h1>
+            <p style='margin: 5px 0 0 0; opacity: 0.9;'>Diseño Completamente al Azar (DCA)</p>
+        </div>
+        <div style='text-align: right; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px;'>
+            <p style='margin: 0; font-size: 14px;'>👨‍🎓 Sergio Ronald Quispe Calsin</p>
+            <p style='margin: 0; font-size: 16px; font-weight: bold;'>📋 Código: 221235</p>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar con estilo verde pastel
-st.sidebar.markdown("""
-<div style='background: linear-gradient(180deg, #a5d6a7 0%, #c8e6c9 100%); 
-            padding: 20px; 
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(46, 125, 50, 0.2);'>
-    <h2 style='color: #1b5e20; text-align: center; margin: 0;'>
-        📋 Navegación
-    </h2>
-</div>
-""", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-seccion = st.sidebar.radio(
-    "Seleccione una sección:",
-    ["🏠 Inicio", "📚 Teoría", "📊 Modelos Experimentales", "📈 Comparación de Modelos"],
-    label_visibility="collapsed"
-)
-
-# Si selecciona Modelos, mostrar submenu
-modelo_seleccionado = None
-if seccion == "📊 Modelos Experimentales":
-    st.sidebar.markdown("""
-    <div style='background-color: #e8f5e9; 
-                padding: 15px; 
-                border-radius: 10px;
-                border-left: 4px solid #66bb6a;
-                margin-top: 10px;'>
-        <h3 style='color: #2e7d32; margin-top: 0;'>🔬 Seleccione el Modelo:</h3>
+# SIDEBAR CON DISEÑO DE MENÚ LATERAL
+with st.sidebar:
+    st.markdown("""
+    <div style='text-align: center; padding: 20px; background: linear-gradient(180deg, #4caf50, #66bb6a); 
+                border-radius: 12px; margin-bottom: 20px;'>
+        <h1 style='color: white; margin: 0; font-size: 48px;'>🥔</h1>
+        <h3 style='color: white; margin: 10px 0 0 0;'>Panel de Control</h3>
     </div>
     """, unsafe_allow_html=True)
     
-    modelo_seleccionado = st.sidebar.selectbox(
-        "Modelo:",
-        ["Modelo 1: Balanceado", "Modelo 2: No Balanceado", 
-         "Modelo 3: Bal-Bal (Sub)", "Modelo 4: Bal-NoBal (Sub)",
-         "Modelo 5: NoBal-Bal (Sub)", "Modelo 6: NoBal-NoBal (Sub)"],
+    st.markdown("### 🎯 Navegación Principal")
+    pagina = st.radio(
+        "Seleccione:",
+        ["🏠 Dashboard", "📊 Análisis por Modelo", "📈 Comparativa Global", "ℹ️ Información"],
         label_visibility="collapsed"
     )
-
-# Funciones para generar datos (mismas que antes)
-def generar_datos_modelo1():
-    np.random.seed(100)
-    datos = []
-    medias = {"T1": 32000, "T2": 28000, "T3": 35000, "T4": 30000}
-    desv = {"T1": 2500, "T2": 2800, "T3": 2200, "T4": 2600}
     
-    for trat in ["T1", "T2", "T3", "T4"]:
-        for i in range(15):
-            rendimiento = np.random.normal(medias[trat], desv[trat])
-            datos.append({
-                "Parcela": i+1,
-                "Tratamiento": trat,
-                "Rendimiento_kg_ha": round(rendimiento, 1)
-            })
-    return pd.DataFrame(datos)
-
-def generar_datos_modelo2():
-    np.random.seed(200)
-    datos = []
-    medias = {"T1": 31500, "T2": 29000, "T3": 36000, "T4": 31000}
-    desv = {"T1": 3000, "T2": 2900, "T3": 2400, "T4": 2700}
-    n_parcelas = {"T1": 14, "T2": 18, "T3": 16, "T4": 20}
+    if pagina == "📊 Análisis por Modelo":
+        st.markdown("---")
+        st.markdown("#### Seleccione Modelo:")
+        modelo = st.selectbox(
+            "Modelo:",
+            ["M1: Balanceado (60)", "M2: No Balanceado (68)", 
+             "M3: Bal-Bal Submuestreo", "M4: Bal-NoBal Submuestreo",
+             "M5: NoBal-Bal Submuestreo", "M6: Completamente Desbal."],
+            label_visibility="collapsed"
+        )
     
-    for trat in ["T1", "T2", "T3", "T4"]:
-        for i in range(n_parcelas[trat]):
-            rendimiento = np.random.normal(medias[trat], desv[trat])
-            datos.append({
-                "Parcela": i+1,
-                "Tratamiento": trat,
-                "Rendimiento_kg_ha": round(rendimiento, 1)
-            })
-    return pd.DataFrame(datos)
-
-def generar_datos_modelo3():
-    np.random.seed(300)
-    datos = []
-    medias = {"T1": 32500, "T2": 28500, "T3": 35500, "T4": 30500}
-    desv_lote = {"T1": 2000, "T2": 2200, "T3": 1800, "T4": 2100}
-    desv_parcela = 1200
-    
-    for trat in ["T1", "T2", "T3", "T4"]:
-        for lote in range(1, 6):
-            media_lote = np.random.normal(medias[trat], desv_lote[trat])
-            for parcela in range(1, 5):
-                rendimiento = np.random.normal(media_lote, desv_parcela)
-                datos.append({
-                    "Lote": f"{trat}-L{lote}",
-                    "Parcela": parcela,
-                    "Tratamiento": trat,
-                    "Rendimiento_kg_ha": round(rendimiento, 1)
-                })
-    return pd.DataFrame(datos)
-
-def generar_datos_modelo4():
-    np.random.seed(400)
-    datos = []
-    medias = {"T1": 31800, "T2": 29500, "T3": 36500, "T4": 31500}
-    desv_lote = {"T1": 2100, "T2": 2300, "T3": 1900, "T4": 2200}
-    desv_parcela = 1100
-    n_parcelas_lote = {"T1": 3, "T2": 4, "T3": 5, "T4": 3}
-    
-    for trat in ["T1", "T2", "T3", "T4"]:
-        for lote in range(1, 6):
-            media_lote = np.random.normal(medias[trat], desv_lote[trat])
-            for parcela in range(1, n_parcelas_lote[trat] + 1):
-                rendimiento = np.random.normal(media_lote, desv_parcela)
-                datos.append({
-                    "Lote": f"{trat}-L{lote}",
-                    "Parcela": parcela,
-                    "Tratamiento": trat,
-                    "Rendimiento_kg_ha": round(rendimiento, 1)
-                })
-    return pd.DataFrame(datos)
-
-def generar_datos_modelo5():
-    np.random.seed(500)
-    datos = []
-    medias = {"T1": 32200, "T2": 28800, "T3": 35800, "T4": 30800}
-    desv_lote = {"T1": 2050, "T2": 2250, "T3": 1850, "T4": 2150}
-    desv_parcela = 1150
-    n_lotes = {"T1": 4, "T2": 6, "T3": 5, "T4": 7}
-    
-    for trat in ["T1", "T2", "T3", "T4"]:
-        for lote in range(1, n_lotes[trat] + 1):
-            media_lote = np.random.normal(medias[trat], desv_lote[trat])
-            for parcela in range(1, 5):
-                rendimiento = np.random.normal(media_lote, desv_parcela)
-                datos.append({
-                    "Lote": f"{trat}-L{lote}",
-                    "Parcela": parcela,
-                    "Tratamiento": trat,
-                    "Rendimiento_kg_ha": round(rendimiento, 1)
-                })
-    return pd.DataFrame(datos)
-
-def generar_datos_modelo6():
-    np.random.seed(600)
-    datos = []
-    medias = {"T1": 31000, "T2": 30000, "T3": 37000, "T4": 32000}
-    desv_lote = {"T1": 2300, "T2": 2500, "T3": 2000, "T4": 2400}
-    desv_parcela = 1300
-    n_lotes = {"T1": 4, "T2": 6, "T3": 5, "T4": 7}
-    parcelas_por_lote = {
-        "T1": [3, 4, 5, 4],
-        "T2": [5, 4, 6, 4, 5, 4],
-        "T3": [4, 5, 3, 6, 4],
-        "T4": [6, 4, 5, 4, 6, 5, 4]
-    }
-    
-    for trat in ["T1", "T2", "T3", "T4"]:
-        for lote in range(n_lotes[trat]):
-            media_lote = np.random.normal(medias[trat], desv_lote[trat])
-            n_parcelas = parcelas_por_lote[trat][lote]
-            for parcela in range(1, n_parcelas + 1):
-                rendimiento = np.random.normal(media_lote, desv_parcela)
-                datos.append({
-                    "Lote": f"{trat}-L{lote+1}",
-                    "Parcela": parcela,
-                    "Tratamiento": trat,
-                    "Rendimiento_kg_ha": round(rendimiento, 1)
-                })
-    return pd.DataFrame(datos)
-
-def calcular_anova_unifactorial_pasos(df):
+    st.markdown("---")
     st.markdown("""
-    <div style='background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%); 
-                padding: 20px; 
-                border-radius: 15px;
-                border-left: 5px solid #66bb6a;
-                margin-bottom: 20px;'>
-        <h3 style='color: #1b5e20; margin: 0;'>📐 Cálculos Paso a Paso - ANOVA Unifactorial</h3>
+    <div style='background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;'>
+        <p style='margin: 0; font-size: 12px; color: #2e7d32;'>
+            <b>💡 Tip:</b> Navega por las diferentes secciones para explorar los análisis completos
+        </p>
     </div>
     """, unsafe_allow_html=True)
+
+# Funciones de generación de datos (mismas)
+def generar_datos_modelo(semilla, medias, desv, n_dict=None):
+    np.random.seed(semilla)
+    datos = []
+    
+    if n_dict is None:
+        n_dict = {t: 15 for t in medias.keys()}
+    
+    for trat in medias.keys():
+        for i in range(n_dict[trat]):
+            rendimiento = np.random.normal(medias[trat], desv[trat])
+            datos.append({
+                "ID": f"{trat}-{i+1:03d}",
+                "Tratamiento": trat,
+                "Rendimiento_kg_ha": round(rendimiento, 1)
+            })
+    return pd.DataFrame(datos)
+
+def obtener_datos_modelo(numero):
+    configs = {
+        1: (100, {"T1": 32000, "T2": 28000, "T3": 35000, "T4": 30000}, 
+            {"T1": 2500, "T2": 2800, "T3": 2200, "T4": 2600}, None),
+        2: (200, {"T1": 31500, "T2": 29000, "T3": 36000, "T4": 31000},
+            {"T1": 3000, "T2": 2900, "T3": 2400, "T4": 2700},
+            {"T1": 14, "T2": 18, "T3": 16, "T4": 20}),
+        3: (300, {"T1": 32500, "T2": 28500, "T3": 35500, "T4": 30500},
+            {"T1": 2000, "T2": 2200, "T3": 1800, "T4": 2100}, None),
+        4: (400, {"T1": 31800, "T2": 29500, "T3": 36500, "T4": 31500},
+            {"T1": 2100, "T2": 2300, "T3": 1900, "T4": 2200}, None),
+        5: (500, {"T1": 32200, "T2": 28800, "T3": 35800, "T4": 30800},
+            {"T1": 2050, "T2": 2250, "T3": 1850, "T4": 2150}, None),
+        6: (600, {"T1": 31000, "T2": 30000, "T3": 37000, "T4": 32000},
+            {"T1": 2300, "T2": 2500, "T3": 2000, "T4": 2400}, None)
+    }
+    return generar_datos_modelo(*configs[numero])
+
+def calcular_anova_simple(df):
+    grupos = [df[df['Tratamiento'] == t]['Rendimiento_kg_ha'].values 
+              for t in df['Tratamiento'].unique()]
+    f_stat, p_value = stats.f_oneway(*grupos)
     
     n_total = len(df)
-    tratamientos = sorted(df['Tratamiento'].unique())
-    k = len(tratamientos)
-    
-    col1, col2, col3 = st.columns(3)
-    col1.metric("🔢 N total", n_total)
-    col2.metric("🧪 Tratamientos", k)
-    col3.metric("📊 Grupos", k)
-    
-    st.markdown("#### Paso 2: Cálculo de medias por tratamiento")
-    medias_df = df.groupby('Tratamiento').agg({
-        'Rendimiento_kg_ha': ['count', 'mean', 'sum']
-    }).round(2)
-    medias_df.columns = ['n', 'Media', 'Suma']
-    st.dataframe(medias_df, use_container_width=True)
-    
+    k = len(df['Tratamiento'].unique())
     grand_mean = df['Rendimiento_kg_ha'].mean()
-    st.success(f"**🎯 Media General (Ȳ..):** {grand_mean:.2f} kg/ha")
-    
-    st.markdown("#### Paso 3: Cálculo de Sumas de Cuadrados")
     
     ss_total = ((df['Rendimiento_kg_ha'] - grand_mean) ** 2).sum()
-    st.info(f"**SCT = {ss_total:.2f}**")
-    
-    ss_between = 0
-    for trat in tratamientos:
-        n_i = len(df[df['Tratamiento'] == trat])
-        mean_i = df[df['Tratamiento'] == trat]['Rendimiento_kg_ha'].mean()
-        ss_i = n_i * (mean_i - grand_mean) ** 2
-        ss_between += ss_i
-    
-    st.info(f"**SC Tratamientos = {ss_between:.2f}**")
-    
+    ss_between = sum([len(df[df['Tratamiento'] == t]) * 
+                      (df[df['Tratamiento'] == t]['Rendimiento_kg_ha'].mean() - grand_mean) ** 2 
+                      for t in df['Tratamiento'].unique()])
     ss_within = ss_total - ss_between
-    st.info(f"**SC Error = {ss_within:.2f}**")
     
     df_between = k - 1
     df_within = n_total - k
-    df_total = n_total - 1
     
     ms_between = ss_between / df_between
     ms_within = ss_within / df_within
     
-    f_calc = ms_between / ms_within
-    p_value = 1 - stats.f.cdf(f_calc, df_between, df_within)
+    return {
+        'F': f_stat, 'P': p_value, 'SS_B': ss_between, 'SS_W': ss_within,
+        'SS_T': ss_total, 'DF_B': df_between, 'DF_W': df_within,
+        'MS_B': ms_between, 'MS_W': ms_within
+    }
+
+# ==================== DASHBOARD PRINCIPAL ====================
+if pagina == "🏠 Dashboard":
     
-    if p_value < 0.05:
+    # CARDS DE INFORMACIÓN
+    cols = st.columns(4)
+    
+    with cols[0]:
         st.markdown("""
-        <div style='background-color: #c8e6c9; padding: 15px; border-radius: 10px; border-left: 5px solid #66bb6a;'>
-            <p style='color: #1b5e20; font-size: 18px; margin: 0;'>
-                ✅ <b>Como p-valor < 0.05, rechazamos H₀</b>
-            </p>
+        <div style='background: linear-gradient(135deg, #66bb6a, #81c784); padding: 20px; border-radius: 12px; text-align: center;'>
+            <h3 style='color: white; margin: 0;'>🧪</h3>
+            <h2 style='color: white; margin: 10px 0;'>4</h2>
+            <p style='color: white; margin: 0; opacity: 0.9;'>Tratamientos</p>
         </div>
         """, unsafe_allow_html=True)
-    else:
-        st.warning("⚠️ Como p-valor ≥ 0.05, no rechazamos H₀")
     
-    return {
-        'SS_Between': ss_between, 'SS_Within': ss_within, 'SS_Total': ss_total,
-        'DF_Between': df_between, 'DF_Within': df_within, 'DF_Total': df_total,
-        'MS_Between': ms_between, 'MS_Within': ms_within,
-        'F_Statistic': f_calc, 'P_Value': p_value
-    }
-
-def calcular_anova_bifactorial_pasos(df):
-    st.markdown("""
-    <div style='background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%); 
-                padding: 20px; 
-                border-radius: 15px;
-                border-left: 5px solid #66bb6a;'>
-        <h3 style='color: #1b5e20; margin: 0;'>📐 ANOVA Bifactorial</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    df_bif = df.copy()
-    df_bif['Factor_A'] = df_bif['Tratamiento']
-    
-    zonas = []
-    for trat in sorted(df_bif['Tratamiento'].unique()):
-        subset = df_bif[df_bif['Tratamiento'] == trat]
-        n_trat = len(subset)
-        n_alta = n_trat // 3
-        n_baja = n_trat // 3
-        n_media = n_trat - n_alta - n_baja
-        zonas_trat = ['Alta'] * n_alta + ['Media'] * n_media + ['Baja'] * n_baja
-        zonas.extend(zonas_trat)
-    
-    df_bif['Factor_B'] = zonas
-    
-    factor_a = sorted(df_bif['Factor_A'].unique())
-    factor_b = sorted(df_bif['Factor_B'].unique())
-    a = len(factor_a)
-    b = len(factor_b)
-    n_total = len(df_bif)
-    
-    grand_mean = df_bif['Rendimiento_kg_ha'].mean()
-    medias_a = df_bif.groupby('Factor_A')['Rendimiento_kg_ha'].mean()
-    medias_b = df_bif.groupby('Factor_B')['Rendimiento_kg_ha'].mean()
-    
-    ss_total = ((df_bif['Rendimiento_kg_ha'] - grand_mean) ** 2).sum()
-    
-    ss_a = sum([len(df_bif[df_bif['Factor_A'] == nivel]) * (medias_a[nivel] - grand_mean) ** 2 
-                for nivel in factor_a])
-    
-    ss_b = sum([len(df_bif[df_bif['Factor_B'] == nivel]) * (medias_b[nivel] - grand_mean) ** 2 
-                for nivel in factor_b])
-    
-    ss_ab = 0
-    for nivel_a in factor_a:
-        for nivel_b in factor_b:
-            subset = df_bif[(df_bif['Factor_A'] == nivel_a) & (df_bif['Factor_B'] == nivel_b)]
-            if len(subset) > 0:
-                n_cell = len(subset)
-                mean_cell = subset['Rendimiento_kg_ha'].mean()
-                ss_ab += n_cell * (mean_cell - medias_a[nivel_a] - medias_b[nivel_b] + grand_mean) ** 2
-    
-    ss_error = ss_total - ss_a - ss_b - ss_ab
-    
-    df_a = a - 1
-    df_b = b - 1
-    df_ab = (a - 1) * (b - 1)
-    df_error = n_total - (a * b)
-    
-    cm_a = ss_a / df_a if df_a > 0 else 0
-    cm_b = ss_b / df_b if df_b > 0 else 0
-    cm_ab = ss_ab / df_ab if df_ab > 0 else 0
-    cm_error = ss_error / df_error if df_error > 0 else 1
-    
-    f_a = cm_a / cm_error if cm_error > 0 else 0
-    f_b = cm_b / cm_error if cm_error > 0 else 0
-    f_ab = cm_ab / cm_error if cm_error > 0 else 0
-    
-    p_a = 1 - stats.f.cdf(f_a, df_a, df_error) if f_a > 0 else 1
-    p_b = 1 - stats.f.cdf(f_b, df_b, df_error) if f_b > 0 else 1
-    p_ab = 1 - stats.f.cdf(f_ab, df_ab, df_error) if f_ab > 0 else 1
-    
-    return {
-        'SS_A': ss_a, 'SS_B': ss_b, 'SS_AB': ss_ab, 'SS_Error': ss_error, 'SS_Total': ss_total,
-        'DF_A': df_a, 'DF_B': df_b, 'DF_AB': df_ab, 'DF_Error': df_error, 'DF_Total': n_total - 1,
-        'MS_A': cm_a, 'MS_B': cm_b, 'MS_AB': cm_ab, 'MS_Error': cm_error,
-        'F_A': f_a, 'F_B': f_b, 'F_AB': f_ab,
-        'P_A': p_a, 'P_B': p_b, 'P_AB': p_ab
-    }
-
-def tukey_hsd(df):
-    from scipy.stats import studentized_range
-    medias = df.groupby('Tratamiento')['Rendimiento_kg_ha'].mean().sort_values(ascending=False)
-    n = df.groupby('Tratamiento')['Rendimiento_kg_ha'].count()
-    
-    grupos = [df[df['Tratamiento'] == t]['Rendimiento_kg_ha'].values for t in df['Tratamiento'].unique()]
-    n_total = len(df)
-    k = len(df['Tratamiento'].unique())
-    
-    ss_within = sum([(df[df['Tratamiento'] == t]['Rendimiento_kg_ha'] - 
-                      df[df['Tratamiento'] == t]['Rendimiento_kg_ha'].mean()).pow(2).sum() 
-                     for t in df['Tratamiento'].unique()])
-    df_within = n_total - k
-    mse = ss_within / df_within
-    
-    comparaciones = []
-    tratamientos = list(medias.index)
-    
-    for i in range(len(tratamientos)):
-        for j in range(i+1, len(tratamientos)):
-            t1, t2 = tratamientos[i], tratamientos[j]
-            diff = abs(medias[t1] - medias[t2])
-            n_harmonic = 2 / (1/n[t1] + 1/n[t2])
-            se = np.sqrt(mse / n_harmonic)
-            q_crit = studentized_range.ppf(0.95, len(tratamientos), df_within)
-            hsd = q_crit * se
-            
-            comparaciones.append({
-                'Comparación': f"{t1} vs {t2}",
-                'Diferencia (kg/ha)': round(diff, 2),
-                'HSD': round(hsd, 2),
-                'Significativo': 'Sí ✅' if diff > hsd else 'No ❌'
-            })
-    
-    return pd.DataFrame(comparaciones), medias
-
-def crear_graficos(df, result_uni):
-    st.markdown("""
-    <div style='background: linear-gradient(135deg, #a5d6a7 0%, #c8e6c9 100%); 
-                padding: 20px; 
-                border-radius: 15px;
-                margin-bottom: 20px;'>
-        <h2 style='color: #1b5e20; margin: 0;'>📊 Visualización de Resultados</h2>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Boxplot con colores verdes
-    colores_verdes = ['#66bb6a', '#81c784', '#a5d6a7', '#c8e6c9']
-    
-    fig_box = px.box(df, x='Tratamiento', y='Rendimiento_kg_ha',
-                     title='🌱 Distribución de Rendimiento por Tratamiento',
-                     labels={'Rendimiento_kg_ha': 'Rendimiento (kg/ha)'},
-                     color='Tratamiento',
-                     color_discrete_sequence=colores_verdes)
-    fig_box.update_layout(
-        plot_bgcolor='rgba(232, 245, 233, 0.3)',
-        paper_bgcolor='white',
-        font=dict(color='#1b5e20', size=14),
-        title_font=dict(size=20, color='#2e7d32')
-    )
-    st.plotly_chart(fig_box, use_container_width=True)
-    
-    # Violin plot
-    fig_violin = px.violin(df, x='Tratamiento', y='Rendimiento_kg_ha',
-                          title='🎻 Densidad de Distribución del Rendimiento',
-                          color='Tratamiento', box=True,
-                          color_discrete_sequence=colores_verdes)
-    fig_violin.update_layout(
-        plot_bgcolor='rgba(232, 245, 233, 0.3)',
-        paper_bgcolor='white',
-        font=dict(color='#1b5e20', size=14),
-        title_font=dict(size=20, color='#2e7d32')
-    )
-    st.plotly_chart(fig_violin, use_container_width=True)
-
-def mostrar_interpretaciones(df, result_uni):
-    st.markdown("""
-    <div style='background: linear-gradient(135deg, #81c784 0%, #a5d6a7 100%); 
-                padding: 25px; 
-                border-radius: 15px;
-                box-shadow: 0 6px 12px rgba(46, 125, 50, 0.2);
-                margin: 20px 0;'>
-        <h2 style='color: white; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);'>
-            💡 Interpretaciones y Conclusiones
-        </h2>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    medias = df.groupby('Tratamiento')['Rendimiento_kg_ha'].mean().sort_values(ascending=False)
-    mejor_trat = medias.index[0]
-    mejor_media = medias.iloc[0]
-    
-    descripciones = {
-        'T1': 'Fertilizante químico NPK 120-80-100',
-        'T2': 'Fertilizante orgánico (compost + humus)',
-        'T3': 'Fertilizante mixto (50% químico + 50% orgánico)',
-        'T4': 'Biofertilizante con microorganismos eficientes'
-    }
-    
-    st.markdown(f"""
-    <div style='background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%); 
-                padding: 25px; 
-                border-radius: 15px;
-                border: 3px solid #66bb6a;
-                box-shadow: 0 6px 12px rgba(0,0,0,0.1);'>
-        <h3 style='color: #1b5e20; margin-top: 0;'>🏆 Mejor Tratamiento</h3>
-        <div style='background-color: white; 
-                    padding: 20px; 
-                    border-radius: 10px;
-                    border-left: 5px solid #43a047;'>
-            <h2 style='color: #2e7d32; margin: 0 0 10px 0;'>{mejor_trat}</h2>
-            <p style='color: #1b5e20; font-size: 18px; margin: 5px 0;'>
-                <b>{descripciones[mejor_trat]}</b>
-            </p>
-            <p style='color: #43a047; font-size: 24px; font-weight: bold; margin: 10px 0 0 0;'>
-                📊 Rendimiento: {mejor_media:.1f} kg/ha ({mejor_media/1000:.1f} ton/ha)
-            </p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    if result_uni['P_Value'] < 0.05:
+    with cols[1]:
         st.markdown("""
-        <div style='background-color: #c8e6c9; 
-                    padding: 15px; 
-                    border-radius: 10px;
-                    margin-top: 15px;
-                    border-left: 5px solid #66bb6a;'>
-            <p style='color: #1b5e20; font-size: 18px; margin: 0;'>
-                ✅ <b>Diferencias estadísticamente significativas detectadas</b>
-            </p>
+        <div style='background: linear-gradient(135deg, #4caf50, #66bb6a); padding: 20px; border-radius: 12px; text-align: center;'>
+            <h3 style='color: white; margin: 0;'>📊</h3>
+            <h2 style='color: white; margin: 10px 0;'>6</h2>
+            <p style='color: white; margin: 0; opacity: 0.9;'>Modelos DCA</p>
         </div>
         """, unsafe_allow_html=True)
-
-def exportar_excel(df, anova_uni, anova_bif, tukey_df):
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, sheet_name='Datos', index=False)
-        
-        anova_uni_df = pd.DataFrame({
-            'Fuente': ['Entre Tratamientos', 'Error', 'Total'],
-            'SC': [anova_uni['SS_Between'], anova_uni['SS_Within'], anova_uni['SS_Total']],
-            'GL': [anova_uni['DF_Between'], anova_uni['DF_Within'], anova_uni['DF_Total']],
-            'CM': [anova_uni['MS_Between'], anova_uni['MS_Within'], ''],
-            'F': [anova_uni['F_Statistic'], '', ''],
-            'P-valor': [anova_uni['P_Value'], '', '']
-        })
-        anova_uni_df.to_excel(writer, sheet_name='ANOVA Unifactorial', index=False)
-        
-        if not tukey_df.empty:
-            tukey_df.to_excel(writer, sheet_name='Tukey HSD', index=False)
     
-    return output.getvalue()
-
-# ==================== SECCIÓN INICIO ====================
-if seccion == "🏠 Inicio":
-    st.markdown("---")
+    with cols[2]:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #388e3c, #4caf50); padding: 20px; border-radius: 12px; text-align: center;'>
+            <h3 style='color: white; margin: 0;'>📈</h3>
+            <h2 style='color: white; margin: 10px 0;'>kg/ha</h2>
+            <p style='color: white; margin: 0; opacity: 0.9;'>Variable</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    st.markdown("""
-    <div style='background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); 
-                padding: 25px; 
-                border-radius: 15px;
-                border: 3px solid #81c784;
-                box-shadow: 0 6px 12px rgba(46, 125, 50, 0.15);
-                margin-bottom: 30px;'>
-        <h2 style='color: #1b5e20; margin-top: 0;'>📄 Contexto del Caso</h2>
-        <p style='font-size: 18px; line-height: 1.8; color: #2e7d32;'>
-            Este estudio tiene como objetivo <b style='color: #1b5e20;'>determinar el mejor fertilizante</b> 
-            para maximizar el rendimiento del cultivo de papa (<i>Solanum tuberosum</i>) hasta alcanzar 
-            un rendimiento comercial óptimo.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    with cols[3]:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #2e7d32, #388e3c); padding: 20px; border-radius: 12px; text-align: center;'>
+            <h3 style='color: white; margin: 0;'>🎯</h3>
+            <h2 style='color: white; margin: 10px 0;'>ANOVA</h2>
+            <p style='color: white; margin: 0; opacity: 0.9;'>Análisis</p>
+        </div>
+        """, unsafe_allow_html=True)
     
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # SECCIÓN DE TRATAMIENTOS
     col1, col2 = st.columns([2, 1])
     
     with col1:
         st.markdown("""
-        <div style='background-color: #c8e6c9; 
-                    padding: 20px; 
-                    border-radius: 12px;
-                    border-left: 5px solid #66bb6a;
-                    margin-bottom: 20px;'>
-            <h3 style='color: #1b5e20; margin-top: 0;'>🌱 Factor Experimental</h3>
-            <p style='color: #2e7d32; font-size: 16px; margin: 0;'>
-                <b>Tipo de fertilizante</b> para cultivo de papa
-            </p>
-        </div>
+        <div style='background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+            <h3 style='color: #2e7d32; margin-top: 0; border-bottom: 3px solid #4caf50; padding-bottom: 10px;'>
+                🌱 Tratamientos Experimentales
+            </h3>
         """, unsafe_allow_html=True)
         
-        st.markdown("### 📋 Tratamientos Evaluados")
-        tratamientos_df = pd.DataFrame({
-            'Código': ['T1', 'T2', 'T3', 'T4'],
-            'Descripción': [
-                '🧪 Fertilizante químico NPK 120-80-100',
-                '🌿 Fertilizante orgánico (compost + humus)',
-                '⚖️ Fertilizante mixto (50% químico + 50% orgánico)',
-                '🦠 Biofertilizante con microorganismos eficientes'
-            ]
-        })
-        st.dataframe(tratamientos_df, use_container_width=True, hide_index=True)
+        tratamientos = [
+            {"icon": "🧪", "codigo": "T1", "nombre": "NPK Químico", "desc": "120-80-100 kg/ha"},
+            {"icon": "🌿", "codigo": "T2", "nombre": "Orgánico", "desc": "Compost + Humus"},
+            {"icon": "⚖️", "codigo": "T3", "nombre": "Mixto", "desc": "50% Químico + 50% Orgánico"},
+            {"icon": "🦠", "codigo": "T4", "nombre": "Biofertilizante", "desc": "Microorganismos eficientes"}
+        ]
         
-        st.markdown("""
-        <div style='background-color: #a5d6a7; 
-                    padding: 20px; 
-                    border-radius: 12px;
-                    margin-top: 20px;'>
-            <h3 style='color: #1b5e20; margin-top: 0;'>📈 Variable Respuesta</h3>
-            <p style='color: white; font-size: 18px; font-weight: bold; margin: 0;'>
-                Rendimiento en kilogramos por hectárea (kg/ha)
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+        for t in tratamientos:
+            st.markdown(f"""
+            <div style='background: #f1f8e9; padding: 15px; margin: 10px 0; border-radius: 8px; 
+                        border-left: 5px solid #4caf50;'>
+                <div style='display: flex; align-items: center;'>
+                    <span style='font-size: 32px; margin-right: 15px;'>{t['icon']}</span>
+                    <div style='flex: 1;'>
+                        <h4 style='margin: 0; color: #2e7d32;'>{t['codigo']}: {t['nombre']}</h4>
+                        <p style='margin: 5px 0 0 0; color: #558b2f; font-size: 14px;'>{t['desc']}</p>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
         
+        st.markdown("</div>", unsafe_allow_html=True)
+    
     with col2:
         st.markdown("""
-        <div style='background: linear-gradient(135deg, #81c784 0%, #a5d6a7 100%); 
-                    padding: 20px; 
-                    border-radius: 15px;
-                    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.2);'>
-            <h3 style='color: white; text-align: center; margin-top: 0;'>📚 Modelos Disponibles</h3>
-            <div style='background-color: rgba(255,255,255,0.9); 
-                        padding: 15px; 
-                        border-radius: 10px;'>
-                <p style='margin: 8px 0; color: #1b5e20;'><b>1️⃣</b> Balanceado</p>
-                <p style='margin: 8px 0; color: #1b5e20;'><b>2️⃣</b> No Balanceado</p>
-                <p style='margin: 8px 0; color: #1b5e20;'><b>3️⃣</b> Bal-Bal (Sub)</p>
-                <p style='margin: 8px 0; color: #1b5e20;'><b>4️⃣</b> Bal-NoBal (Sub)</p>
-                <p style='margin: 8px 0; color: #1b5e20;'><b>5️⃣</b> NoBal-Bal (Sub)</p>
-                <p style='margin: 8px 0; color: #1b5e20;'><b>6️⃣</b> NoBal-NoBal (Sub)</p>
-            </div>
+        <div style='background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+            <h3 style='color: #2e7d32; margin-top: 0;'>📋 Objetivo</h3>
+            <p style='color: #555; line-height: 1.6;'>
+                Determinar el <b style='color: #2e7d32;'>fertilizante más efectivo</b> 
+                para maximizar el rendimiento del cultivo de papa.
+            </p>
+            <hr style='border: 1px solid #e0e0e0;'>
+            <h4 style='color: #2e7d32;'>📊 Variable</h4>
+            <p style='color: #555;'>Rendimiento (kg/ha)</p>
+            <hr style='border: 1px solid #e0e0e0;'>
+            <h4 style='color: #2e7d32;'>🔬 Diseño</h4>
+            <p style='color: #555;'>Completamente al Azar</p>
         </div>
         """, unsafe_allow_html=True)
-
-# ==================== SECCIÓN TEORÍA ====================
-elif seccion == "📚 Teoría":
-    st.header("📚 Marco Teórico")
-    st.markdown("### Diseño Completamente al Azar (DCA)")
-    st.latex(r"Y_{ij} = \mu + \tau_i + \varepsilon_{ij}")
-
-# ==================== SECCIÓN MODELOS ====================
-elif seccion == "📊 Modelos Experimentales":
     
-    def mostrar_analisis_completo(df, titulo, descripcion):
-        st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #66bb6a 0%, #81c784 100%); 
-                    padding: 20px; 
-                    border-radius: 15px;
-                    margin-bottom: 20px;'>
-            <h2 style='color: white; margin: 0;'>{titulo}</h2>
-            <p style='color: white; font-size: 16px; margin: 10px 0 0 0;'>{descripcion}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(
-            ["📊 Datos", "🔢 ANOVA Unifactorial", "🔢 ANOVA Bifactorial", 
-             "📈 Gráficos", "📥 Exportar"]
-        )
-        
-        with tab1:
-            st.subheader("Datos Experimentales")
-            st.dataframe(df, use_container_width=True, height=400)
-            
-            summary = df.groupby('Tratamiento')['Rendimiento_kg_ha'].agg([
-                ('N', 'count'), ('Media', 'mean'), ('Desv.Est.', 'std'),
-                ('Mín', 'min'), ('Máx', 'max')
-            ]).round(2)
-            st.dataframe(summary, use_container_width=True)
-        
-        with tab2:
-            result_uni = calcular_anova_unifactorial_pasos(df)
-            
-            if result_uni['P_Value'] < 0.05:
-                st.markdown("### 🔍 Prueba de Tukey HSD")
-                tukey_df, medias = tukey_hsd(df)
-                st.dataframe(tukey_df, use_container_width=True, hide_index=True)
-        
-        with tab3:
-            result_bif = calcular_anova_bifactorial_pasos(df)
-        
-        with tab4:
-            crear_graficos(df, result_uni)
-            mostrar_interpretaciones(df, result_uni)
-        
-        with tab5:
-            tukey_df, _ = tukey_hsd(df) if result_uni['P_Value'] < 0.05 else (pd.DataFrame(), None)
-            excel_data = exportar_excel(df, result_uni, result_bif, tukey_df)
-            st.download_button("📥 Descargar Excel Completo", excel_data, 
-                             f"{titulo.lower().replace(' ', '_')}.xlsx",
-                             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    if modelo_seleccionado == "Modelo 1: Balanceado":
-        df = generar_datos_modelo1()
-        mostrar_analisis_completo(df, "🌱 Modelo 1: DCA Balanceado", 
-                                 "60 parcelas experimentales (15 por tratamiento)")
-    elif modelo_seleccionado == "Modelo 2: No Balanceado":
-        df = generar_datos_modelo2()
-        mostrar_analisis_completo(df, "🌱 Modelo 2: No Balanceado", 
-                                 "68 parcelas con distribución desigual")
-    elif modelo_seleccionado == "Modelo 3: Bal-Bal (Sub)":
-        df = generar_datos_modelo3()
-        mostrar_analisis_completo(df, "🌱 Modelo 3: Bal-Bal", 
-                                 "20 lotes, 4 parcelas por lote")
-    elif modelo_seleccionado == "Modelo 4: Bal-NoBal (Sub)":
-        df = generar_datos_modelo4()
-        mostrar_analisis_completo(df, "🌱 Modelo 4: Bal-NoBal", 
-                                 "20 lotes, parcelas variables por lote")
-    elif modelo_seleccionado == "Modelo 5: NoBal-Bal (Sub)":
-        df = generar_datos_modelo5()
-        mostrar_analisis_completo(df, "🌱 Modelo 5: NoBal-Bal", 
-                                 "Lotes desiguales, 4 parcelas por lote")
-    elif modelo_seleccionado == "Modelo 6: NoBal-NoBal (Sub)":
-        df = generar_datos_modelo6()
-        mostrar_analisis_completo(df, "🌱 Modelo 6: Completamente Desbalanceado", 
-                                 "Estructura completamente variable")
-
-# ==================== COMPARACIÓN ====================
-elif seccion == "📈 Comparación de Modelos":
+    # VISTA RÁPIDA DE MODELOS
     st.markdown("""
-    <div style='background: linear-gradient(135deg, #81c784 0%, #a5d6a7 100%); 
-                padding: 25px; 
-                border-radius: 15px;
-                margin-bottom: 25px;'>
-        <h2 style='color: white; margin: 0;'>📈 Comparación entre Modelos Experimentales</h2>
+    <div style='background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+        <h3 style='color: #2e7d32; margin-top: 0;'>📊 Modelos Disponibles</h3>
+    """, unsafe_allow_html=True)
+    
+    cols = st.columns(3)
+    modelos_info = [
+        ("M1", "Balanceado", "60 parcelas (15×4)", "#66bb6a"),
+        ("M2", "No Balanceado", "68 parcelas", "#4caf50"),
+        ("M3", "Bal-Bal Sub", "20 lotes, 4 parc/lote", "#388e3c"),
+        ("M4", "Bal-NoBal Sub", "20 lotes, var parc", "#2e7d32"),
+        ("M5", "NoBal-Bal Sub", "Lotes var, 4 parc", "#1b5e20"),
+        ("M6", "Desbalanceado", "Estructura variable", "#33691e")
+    ]
+    
+    for i, (cod, nombre, desc, color) in enumerate(modelos_info):
+        with cols[i % 3]:
+            st.markdown(f"""
+            <div style='background: {color}; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center;'>
+                <h3 style='color: white; margin: 0;'>{cod}</h3>
+                <p style='color: white; margin: 8px 0; font-size: 16px; font-weight: bold;'>{nombre}</p>
+                <p style='color: rgba(255,255,255,0.9); margin: 0; font-size: 13px;'>{desc}</p>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ==================== ANÁLISIS POR MODELO ====================
+elif pagina == "📊 Análisis por Modelo":
+    
+    num_modelo = int(modelo.split(":")[0][1])
+    df = obtener_datos_modelo(num_modelo)
+    anova = calcular_anova_simple(df)
+    
+    # HEADER DEL MODELO
+    st.markdown(f"""
+    <div style='background: linear-gradient(135deg, #4caf50, #66bb6a); 
+                padding: 20px 30px; border-radius: 12px; margin-bottom: 25px;'>
+        <h2 style='color: white; margin: 0;'>{modelo}</h2>
+        <p style='color: white; margin: 5px 0 0 0; opacity: 0.9;'>
+            📊 {len(df)} observaciones | 🧪 {df['Tratamiento'].nunique()} tratamientos
+        </p>
     </div>
     """, unsafe_allow_html=True)
     
-    modelos_data = {
-        "Modelo 1": generar_datos_modelo1(),
-        "Modelo 2": generar_datos_modelo2(),
-        "Modelo 3": generar_datos_modelo3(),
-        "Modelo 4": generar_datos_modelo4(),
-        "Modelo 5": generar_datos_modelo5(),
-        "Modelo 6": generar_datos_modelo6()
-    }
+    # PESTAÑAS CON DISEÑO LIMPIO
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Datos", "🧮 ANOVA", "📊 Visualización", "💾 Exportar"])
+    
+    with tab1:
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.markdown("#### 📊 Tabla de Datos")
+            st.dataframe(df, use_container_width=True, height=400)
+        
+        with col2:
+            st.markdown("#### 📈 Estadísticas")
+            stats_df = df.groupby('Tratamiento')['Rendimiento_kg_ha'].agg(['count', 'mean', 'std']).round(1)
+            stats_df.columns = ['n', 'Media', 'DE']
+            st.dataframe(stats_df, use_container_width=True)
+            
+            st.markdown("#### 🎯 Resumen")
+            mejor = df.groupby('Tratamiento')['Rendimiento_kg_ha'].mean().idxmax()
+            mejor_val = df.groupby('Tratamiento')['Rendimiento_kg_ha'].mean().max()
+            st.success(f"**Mejor:** {mejor}")
+            st.metric("Rendimiento", f"{mejor_val:.0f} kg/ha")
+    
+    with tab2:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 📊 Tabla ANOVA")
+            anova_table = pd.DataFrame({
+                'Fuente': ['Tratamientos', 'Error', 'Total'],
+                'SC': [f"{anova['SS_B']:.1f}", f"{anova['SS_W']:.1f}", f"{anova['SS_T']:.1f}"],
+                'GL': [anova['DF_B'], anova['DF_W'], anova['DF_B'] + anova['DF_W']],
+                'CM': [f"{anova['MS_B']:.1f}", f"{anova['MS_W']:.1f}", '-'],
+                'F': [f"{anova['F']:.3f}", '-', '-'],
+                'P-valor': [f"{anova['P']:.4f}", '-', '-']
+            })
+            st.dataframe(anova_table, use_container_width=True, hide_index=True)
+        
+        with col2:
+            st.markdown("#### 🎯 Resultado")
+            if anova['P'] < 0.05:
+                st.success("✅ **SIGNIFICATIVO**")
+                st.write(f"p-valor = {anova['P']:.4f} < 0.05")
+                st.write("Existen diferencias entre tratamientos")
+            else:
+                st.warning("⚠️ **NO SIGNIFICATIVO**")
+                st.write(f"p-valor = {anova['P']:.4f} ≥ 0.05")
+            
+            st.markdown("#### 📊 Estadístico F")
+            st.metric("Valor F", f"{anova['F']:.3f}")
+    
+    with tab3:
+        # Gráfico de cajas horizontal
+        fig1 = px.box(df, y='Tratamiento', x='Rendimiento_kg_ha', 
+                      orientation='h',
+                      title='Distribución por Tratamiento',
+                      color='Tratamiento',
+                      color_discrete_sequence=['#66bb6a', '#4caf50', '#388e3c', '#2e7d32'])
+        fig1.update_layout(showlegend=False, height=400)
+        st.plotly_chart(fig1, use_container_width=True)
+        
+        # Gráfico de promedios
+        medias = df.groupby('Tratamiento')['Rendimiento_kg_ha'].mean().reset_index()
+        fig2 = go.Figure(data=[
+            go.Bar(x=medias['Tratamiento'], y=medias['Rendimiento_kg_ha'],
+                   marker_color=['#66bb6a', '#4caf50', '#388e3c', '#2e7d32'])
+        ])
+        fig2.update_layout(title='Rendimiento Promedio', height=400,
+                          yaxis_title='Rendimiento (kg/ha)')
+        st.plotly_chart(fig2, use_container_width=True)
+    
+    with tab4:
+        st.markdown("#### 💾 Descargar Resultados")
+        
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, sheet_name='Datos', index=False)
+            anova_table.to_excel(writer, sheet_name='ANOVA', index=False)
+        
+        st.download_button(
+            "📥 Descargar Excel",
+            data=output.getvalue(),
+            file_name=f"modelo_{num_modelo}_resultados.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+# ==================== COMPARATIVA GLOBAL ====================
+elif pagina == "📈 Comparativa Global":
+    
+    st.markdown("""
+    <div style='background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+        <h2 style='color: #2e7d32; margin-top: 0;'>📈 Comparación entre Todos los Modelos</h2>
+    """, unsafe_allow_html=True)
     
     comparacion = []
-    for nombre, df in modelos_data.items():
-        grupos = [df[df['Tratamiento'] == t]['Rendimiento_kg_ha'].values 
-                 for t in df['Tratamiento'].unique()]
-        f_stat, p_value = stats.f_oneway(*grupos)
-        media_general = df['Rendimiento_kg_ha'].mean()
+    for i in range(1, 7):
+        df = obtener_datos_modelo(i)
+        anova = calcular_anova_simple(df)
+        mejor = df.groupby('Tratamiento')['Rendimiento_kg_ha'].mean().idxmax()
         
         comparacion.append({
-            'Modelo': nombre,
-            'n Total': len(df),
-            'Media General (kg/ha)': round(media_general, 1),
-            'F-statistic': round(f_stat, 4),
-            'P-valor': round(p_value, 6),
-            'Significativo': 'Sí ✅' if p_value < 0.05 else 'No ❌'
+            'Modelo': f'M{i}',
+            'n': len(df),
+            'F-stat': round(anova['F'], 3),
+            'P-valor': round(anova['P'], 4),
+            'Significativo': '✅' if anova['P'] < 0.05 else '❌',
+            'Mejor Trat.': mejor
         })
     
     comp_df = pd.DataFrame(comparacion)
     st.dataframe(comp_df, use_container_width=True, hide_index=True)
+    
+    # Gráfico comparativo
+    fig = px.bar(comp_df, x='Modelo', y='F-stat', 
+                 color='Significativo',
+                 color_discrete_map={'✅': '#4caf50', '❌': '#e57373'},
+                 title='Estadísticos F por Modelo')
+    st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Footer con estilo verde
-st.markdown("---")
+# ==================== INFORMACIÓN ====================
+elif pagina == "ℹ️ Información":
+    
+    st.markdown("""
+    <div style='background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+        <h2 style='color: #2e7d32;'>ℹ️ Acerca del Sistema</h2>
+        <p style='color: #555; font-size: 16px; line-height: 1.8;'>
+            Sistema desarrollado para el análisis estadístico de diseños experimentales 
+            completamente al azar (DCA) en estudios de fertilización de papa.
+        </p>
+        
+        <h3 style='color: #2e7d32; margin-top: 30px;'>🎓 Autor</h3>
+        <p style='color: #555;'><b>Sergio Ronald Quispe Calsin</b><br>Código: 221235</p>
+        
+        <h3 style='color: #2e7d32; margin-top: 30px;'>🛠️ Tecnologías</h3>
+        <ul style='color: #555;'>
+            <li>Python + Streamlit</li>
+            <li>Pandas & NumPy</li>
+            <li>SciPy (Análisis estadístico)</li>
+            <li>Plotly (Visualización)</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Footer minimalista
+st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("""
-<div style='background: linear-gradient(135deg, #a5d6a7 0%, #c8e6c9 100%); 
-            padding: 20px; 
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(46, 125, 50, 0.2);'>
-    <p style='color: #1b5e20; font-size: 16px; margin: 0;'>
-        <b>🌱 Desarrollado para análisis estadístico de diseños experimentales en agricultura 🥔</b>
-    </p>
-    <p style='color: #2e7d32; font-size: 18px; font-weight: bold; margin: 10px 0 0 0;'>
-        Sergio Ronald Quispe Calsin | Código: 221235
-    </p>
+<div style='text-align: center; color: #999; padding: 20px; border-top: 1px solid #e0e0e0;'>
+    <p style='margin: 0;'>🥔 Sistema DCA Papa © 2025 | Sergio Ronald Quispe Calsin</p>
 </div>
 """, unsafe_allow_html=True)
